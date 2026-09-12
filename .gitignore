@@ -1,0 +1,23 @@
+# Local environment files and backups
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# Go build and test artifacts
+bin/
+*.exe
+*.exe~
+*.test
+*.out
+
+# Local IDE and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
