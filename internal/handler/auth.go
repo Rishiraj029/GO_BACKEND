@@ -2,14 +2,26 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
+	"devconnect/internal/apperror"
 	"devconnect/internal/model"
+	"devconnect/internal/service"
 	"devconnect/internal/validator"
 )
 
-func Register(w http.ResponseWriter, r *http.Request) {
+type AuthHandler struct {
+	authService *service.AuthService
+}
 
+func NewAuthHandler(authService *service.AuthService) *AuthHandler {
+	return &AuthHandler{
+		authService: authService,
+	}
+}
+
+func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var request model.RegisterRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -26,8 +38,27 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, err := h.authService.Register(request)
+
+	if err != nil {
+		if errors.Is(err, apperror.ErrEmailAlreadyExists) {
+			http.Error(
+				w,
+				"email already exists",
+				http.StatusConflict,
+			)
+			return
+		}
+
+		http.Error(
+			w,
+			"Failed to register user",
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 
-	json.NewEncoder(w).Encode(request)
-
+	json.NewEncoder(w).Encode(user)
 }

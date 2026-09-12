@@ -25,3 +25,15 @@ func ValidateRegisterRequest(request model.RegisterRequest) string {
 
 	return ""
 }
+
+func ValidateLoginRequest(request model.LoginRequest) string {
+	if strings.TrimSpace(request.Email) == "" {
+		return "email is required"
+	}
+
+	if strings.TrimSpace(request.Password) == "" {
+		return "password is required"
+	}
+
+	return ""
+}
